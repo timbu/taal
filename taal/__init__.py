@@ -61,6 +61,9 @@ class TranslatableString(object):
         other_data = (other.context, other.message_id, other.pending_value)
         return self_data == other_data
 
+    def __hash__(self):
+        return hash((self.context, self.message_id, self.pending_value))
+
 
 class TranslationStrategies(object):
     NONE_VALUE = 'NONE_VALUE'
@@ -85,7 +88,6 @@ class Translator(object):
 
     Given a sqlalchemy session, a model to store translations, and
     a language, bind a translator to a(n other) sqlalchemy session
-    and/or a kaiso manager to get translation magic
 
     Language may be either a string, or a callable returning a string, for
     more dynamic behaviour.
@@ -130,16 +132,12 @@ class Translator(object):
         return self.get_language()
 
     def bind(self, target):
-        """ register e.g. a sqlalchey session or a kaiso manager """
-        from taal.kaiso import manager
 
         if isinstance(target, Session):
             from taal.sqlalchemy.events import (
                 register_translator, register_session)
             register_translator(target, self)
             register_session(target)
-        elif isinstance(target, manager.Manager):
-            manager.register_translator(target, self)
         else:
             raise BindError("Unknown target {}".format(target))
 
@@ -181,7 +179,7 @@ class Translator(object):
         elif isinstance(translatable, dict):
             return dict(
                 (key, self.translate(val, strategy=strategy, cache=cache))
-                for key, val in translatable.iteritems()
+                for key, val in translatable.items()
             )
         elif isinstance(translatable, list):
             return list(
@@ -233,7 +231,7 @@ class Translator(object):
             collection.add((translatable.context, translatable.message_id))
         elif isinstance(translatable, dict):
             [self._collect_translatables(val, collection)
-                for val in translatable.itervalues()]
+                for val in translatable.values()]
         elif isinstance(translatable, list):
             [self._collect_translatables(item, collection)
                 for item in translatable]
@@ -463,7 +461,7 @@ class TranslationManager(object):
         self._registry[context] = context_manager
 
     def list_contexts_and_message_ids(self, **kwargs):
-        for context, context_manager_cls in self._registry.iteritems():
+        for context, context_manager_cls in self._registry.items():
             context_manager = context_manager_cls(**kwargs)
             for message_id in context_manager.list_message_ids():
                 yield (context, message_id)

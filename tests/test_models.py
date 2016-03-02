@@ -7,7 +7,6 @@ from taal import Translator, TranslatableString
 from tests.models import Translation
 
 
-@pytest.mark.usefixtures('manager')
 class TestModels(object):
     def test_create(self, session):
         translation = Translation(
@@ -83,7 +82,6 @@ class TestModels(object):
         translator.translate(translatable)
 
 
-@pytest.mark.usefixtures('manager')
 class TestWriting(object):
     def test_save_translation(self, session, session_cls):
         translator = Translator(Translation, session, 'language')

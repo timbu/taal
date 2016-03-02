@@ -13,7 +13,6 @@ SAMPLE_MESSAGE_ID = 'message_id ಠ_ಠ'
 SAMPLE_LANGUAGE = 'language ಠ_ಠ'
 
 
-@pytest.mark.usefixtures('manager')
 class TestStrategies(object):
     def test_none_value(self, session):
         translator = Translator(Translation, session, SAMPLE_LANGUAGE)
@@ -92,7 +91,7 @@ class TestStrategies(object):
                 language=None,
                 strategy='invalid ಠ_ಠ',
             )
-        assert 'Invalid strategy `invalid ಠ_ಠ`' in unicode(exc)
+        assert 'Invalid strategy `invalid ಠ_ಠ`' in str(exc)
 
     def test_invalid_override(self):
         translator = Translator(
@@ -102,4 +101,4 @@ class TestStrategies(object):
         )
         with pytest.raises(ValueError) as exc:
             translator.translate(None, strategy='invalid ಠ_ಠ')
-        assert 'Invalid strategy `invalid ಠ_ಠ`' in unicode(exc)
+        assert 'Invalid strategy `invalid ಠ_ಠ`' in str(exc)
